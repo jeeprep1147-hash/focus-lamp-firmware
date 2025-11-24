@@ -3,6 +3,7 @@
 #include "timer_handler.h"
 #include "lamp_handler.h"
 
+// Create Encoder Object
 static AiEsp32RotaryEncoder rotaryEncoder = AiEsp32RotaryEncoder(ENC_CLK, ENC_DT, ENC_SW, -1, 4);
 
 void IRAM_ATTR readEncoderISR() {
@@ -12,35 +13,41 @@ void IRAM_ATTR readEncoderISR() {
 void initInputs() {
   rotaryEncoder.begin();
   rotaryEncoder.setup(readEncoderISR);
+  
+  // Set boundaries: 0 to 255 (PWM range), loop = false
+  rotaryEncoder.setBoundaries(0, 255, false); 
+  rotaryEncoder.setEncoderValue(128); // Start at half brightness
+
   pinMode(ENC_SW, INPUT);
   attachInterrupt(digitalPinToInterrupt(ENC_SW), []() {
     static unsigned long lastInterruptTime = 0;
     unsigned long interruptTime = millis();
     
     if (interruptTime - lastInterruptTime > 200) {  // Debounce
-      timerRunning = !timerRunning;  // Toggle timer
+      if (timerRunning) {
+          stopTimer();
+      } else {
+          startTimer(0); // Start Focus Mode
+      }
       lastInterruptTime = interruptTime;
     }
   }, FALLING);
 }
 
 void handleInputs() {
-  static unsigned long lastUpdate = 0;
-  if (millis() - lastUpdate > 50) {  // Update at 20Hz
-    int encoderDelta = rotaryEncoder.encoderChangedValue();
-    
-    if (encoderDelta != 0) {
+  // Check if knob has been twisted
+  if (rotaryEncoder.encoderChanged()) {
+      
+      // Get the new value (0-255) directly from the library
+      manualBrightness = rotaryEncoder.readEncoder();
+      
+      // Enable manual mode so auto-sensor doesn't override us
       manualMode = true;
       
-      // Adjust brightness with encoder
-      manualBrightness += encoderDelta;
-      if (manualBrightness < 0) manualBrightness = 0;
-      if (manualBrightness > 255) manualBrightness = 255;
-      
+      // Apply brightness immediately
       setLampBrightness(manualBrightness);
       
-      rotaryEncoder.setEncoderValue(manualBrightness);
-    }
-    lastUpdate = millis();
+      Serial.print("Manual Brightness: ");
+      Serial.println(manualBrightness);
   }
 }

@@ -6,20 +6,21 @@
 #include "connectivity_handler.h"
 #include "ui_handler.h"
 
-// Global Variables
+// Global Variables Definition
 TFT_eSPI tft = TFT_eSPI();
 int currentBrightness = 0;
 bool isFocusMode = true;
 int timerSeconds = POMODORO_DURATION;
 bool timerRunning = false;
 String currentTask = "No Task";
+
+// --- THESE WERE MISSING ---
 int manualBrightness = 128;
 bool manualMode = false;
 
 void setup() {
   Serial.begin(115200);
   
-  // Initialize all handlers
   initLamp();
   initSensors();
   initInputs();
@@ -27,17 +28,18 @@ void setup() {
   initConnectivity();
   initUI();
   
-  // Draw initial UI
   drawMainUI();
   updateUI();
 }
 
 void loop() {
-  // Handle all subsystems
   handleInputs();
-  if (!manualMode) {  // Only auto-adjust brightness in auto mode
+  
+  // Only run auto-brightness if user hasn't taken manual control
+  if (!manualMode) {  
     handleSensors();
   }
+  
   handleTimer();
   runConnectivity();
   updateUI();
