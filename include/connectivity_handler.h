@@ -3,7 +3,6 @@
 
 #include "config.h"
 #include <WiFi.h>
-#include <BlynkSimpleEsp32.h>
 
 // Initialize WiFi and Blynk
 void initConnectivity();
@@ -18,6 +17,6 @@ void sendTaskToBlynk();
 void runConnectivity();
 
 // Blynk write function for task
-BLYNK_WRITE(V3);
+void blynkWriteV3(const String& param);
 
 #endif

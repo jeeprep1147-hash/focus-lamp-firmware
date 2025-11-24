@@ -4,14 +4,7 @@
 #include <Arduino.h>
 #include <TFT_eSPI.h>
 
-// Blynk Credentials
-#define BLYNK_TEMPLATE_ID "TMPL3PuTM9T5R"
-#define BLYNK_DEVICE_NAME "Focus Lamp"
-#define BLYNK_AUTH_TOKEN "TpO2gZhZTs9GS5dUL404E3Dxd7Xp_lRh"
-
-// WiFi Credentials
-#define WIFI_SSID "SAIABODE"
-#define WIFI_PASS "9963976392"
+// Credentials are now in platformio.ini
 
 // Pin Definitions
 #define ENC_CLK 35
@@ -19,7 +12,7 @@
 #define ENC_SW 36
 #define LIGHT_SENSOR_SDA 21
 #define LIGHT_SENSOR_SCL 22
-#define LED_PIN 18  // Changed to 18 to avoid conflict with Screen RD pin
+#define LED_PIN 18  // Safe Pin (Moved from 2)
 #define BUZZER_PIN 5
 
 // Timer Constants
@@ -34,9 +27,10 @@ extern bool isFocusMode;
 extern int timerSeconds;
 extern bool timerRunning;
 extern String currentTask;
-
-// --- THESE WERE MISSING ---
 extern int manualBrightness;
 extern bool manualMode;
+
+// Function Prototype
+void sendTimerStatusToBlynk(int minutes, int seconds, int mode);
 
 #endif

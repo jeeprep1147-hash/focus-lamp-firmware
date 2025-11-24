@@ -1,21 +1,11 @@
 #include "config.h"
 #include "connectivity_handler.h"
 #include "timer_handler.h"
+#include <BlynkSimpleEsp32.h>
 
 void initConnectivity() {
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
-  
-  Serial.print("Connecting to WiFi");
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println();
-  Serial.print("Connected, IP address: ");
-  Serial.println(WiFi.localIP());
-  
-  Blynk.config(BLYNK_AUTH_TOKEN);
-  Blynk.connect();
+  // Credentials from platformio.ini are automatically used here
+  Blynk.begin(BLYNK_AUTH_TOKEN, WIFI_SSID, WIFI_PASS);
 }
 
 void sendTimerStatusToBlynk(int minutes, int seconds, int mode) {
@@ -36,6 +26,10 @@ void runConnectivity() {
   Blynk.run();
 }
 
+void blynkWriteV3(const String& param) {
+  currentTask = param;
+}
+
 BLYNK_WRITE(V3) {
-  currentTask = param.asString();
+  blynkWriteV3(param.asString());
 }
